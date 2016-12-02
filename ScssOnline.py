@@ -6,6 +6,10 @@ import json, shlex, os
 class ScssonlimeCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 
+		filename = self.view.file_name()
+		if filename.endswith('scss') == False:
+			return
+
 		scss_size = self.view.size()
 		scss = self.view.substr(sublime.Region(0, scss_size))
 		payload = {
@@ -22,7 +26,7 @@ class ScssonlimeCommand(sublime_plugin.TextCommand):
 		response = opener.open(request)
 		json_str = response.read().decode(encoding='utf-8', errors='strict')
 		contents = json.loads(json_str)
-		filename = self.view.file_name()
+		
 
 		new_css_file_name = filename+'.css'
 		new_css = contents["css"]
@@ -36,6 +40,7 @@ class ScssonlimeCommand(sublime_plugin.TextCommand):
 		new_css_file_view.insert(edit, 0, new_css)
 		new_css_file_view.set_encoding('css')
 		new_css_file_view.run_command('save')
-
+		new_css_file_view.run_command('autoprefixer')
+		new_css_file_view.run_command('save')
 		return
 		
